@@ -4,6 +4,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
+import { LogIn } from "lucide-react";
 
 export default function LoginForm() {
   const navigate = useNavigate();
@@ -47,36 +49,61 @@ export default function LoginForm() {
   };
 
   return (
-    <Card className="w-[400px] bg-white">
-      <CardHeader>
-        <CardTitle>Admin Login</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="space-y-2">
-            <Input
-              type="email"
-              placeholder="Email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-            />
-          </div>
-          <div className="space-y-2">
-            <Input
-              type="password"
-              placeholder="Password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-            />
-          </div>
-          {error && <p className="text-sm text-red-500 mb-4">{error}</p>}
-          <Button type="submit" className="w-full" disabled={isLoading}>
-            Login
-          </Button>
-        </form>
-      </CardContent>
-    </Card>
+    <div className="min-h-screen flex items-center justify-center bg-[#FAFAF9] p-6">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+      >
+        <Card className="w-[400px] border-[#E5DDD3] bg-white shadow-lg">
+          <CardHeader className="space-y-1">
+            <CardTitle className="font-serif text-2xl text-[#1B365D] text-center">
+              Admin Login
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div className="space-y-2">
+                <Input
+                  type="email"
+                  placeholder="Email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                  className="border-[#E5DDD3] focus:border-[#1B365D] transition-colors duration-200"
+                />
+              </div>
+              <div className="space-y-2">
+                <Input
+                  type="password"
+                  placeholder="Password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  className="border-[#E5DDD3] focus:border-[#1B365D] transition-colors duration-200"
+                />
+              </div>
+              {error && (
+                <motion.p
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  className="text-sm text-red-500 text-center"
+                >
+                  {error}
+                </motion.p>
+              )}
+              <Button
+                type="submit"
+                className="w-full bg-[#1B365D] hover:bg-[#264773] transition-colors duration-200 mt-2"
+                disabled={isLoading}
+              >
+                <LogIn className="w-4 h-4 mr-2" />
+                {isLoading ? "Signing in..." : "Sign In"}
+              </Button>
+            </form>
+          </CardContent>
+        </Card>
+      </motion.div>
+    </div>
   );
 }

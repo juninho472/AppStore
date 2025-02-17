@@ -27,23 +27,33 @@ function PrivateRoute({ children }: { children: React.ReactNode }) {
 }
 
 function App() {
+  // Get the tempo routes
+  const tempoRoutes =
+    import.meta.env.VITE_TEMPO === "true" ? useRoutes(routes) : null;
+
   return (
-    <Suspense fallback={<p>Loading...</p>}>
-      <>
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/login" element={<LoginForm />} />
-          <Route
-            path="/admin"
-            element={
-              <PrivateRoute>
-                <AdminDashboard />
-              </PrivateRoute>
-            }
-          />
-        </Routes>
-        {import.meta.env.VITE_TEMPO === "true" && useRoutes(routes)}
-      </>
+    <Suspense
+      fallback={
+        <div className="flex items-center justify-center h-screen">
+          <p className="text-[#1B365D] font-serif text-xl">Loading...</p>
+        </div>
+      }
+    >
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/login" element={<LoginForm />} />
+        <Route
+          path="/admin"
+          element={
+            <PrivateRoute>
+              <AdminDashboard />
+            </PrivateRoute>
+          }
+        />
+        {/* Add a catch-all route that redirects to home */}
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+      {tempoRoutes}
     </Suspense>
   );
 }
