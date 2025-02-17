@@ -1,6 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Plus, Download, Package } from "lucide-react";
+import { Plus, Download, Package, LogOut } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -12,6 +12,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useState, useEffect } from "react";
 import { api } from "@/lib/api";
+import { motion } from "framer-motion";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -31,6 +32,21 @@ interface App {
   version: string;
   downloads: number;
 }
+
+const container = {
+  hidden: { opacity: 0 },
+  show: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.1,
+    },
+  },
+};
+
+const item = {
+  hidden: { opacity: 0, y: 20 },
+  show: { opacity: 1, y: 0 },
+};
 
 export default function AdminDashboard() {
   const navigate = useNavigate();
@@ -93,122 +109,202 @@ export default function AdminDashboard() {
   };
 
   return (
-    <div className="p-6 max-w-7xl mx-auto space-y-6">
-      <div className="flex justify-between items-center gap-4">
-        <div className="flex items-center gap-4">
-          <h1 className="text-2xl font-bold">Admin Dashboard</h1>
-          <Button variant="outline" onClick={handleSignOut}>
-            Sign Out
-          </Button>
-        </div>
-        <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
-          <DialogTrigger asChild>
-            <Button>
-              <Plus className="w-4 h-4 mr-2" /> Add New App
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.5 }}
+      className="min-h-screen bg-[#FAFAF9] p-6"
+    >
+      <div className="max-w-7xl mx-auto space-y-6">
+        <motion.div
+          className="flex justify-between items-center gap-4 bg-white p-6 rounded-xl border border-[#E5DDD3] shadow-sm"
+          initial={{ y: -20 }}
+          animate={{ y: 0 }}
+          transition={{ duration: 0.5 }}
+        >
+          <div className="flex items-center gap-4">
+            <h1 className="text-2xl font-serif font-bold text-[#1B365D]">
+              Admin Dashboard
+            </h1>
+            <Button
+              variant="outline"
+              onClick={handleSignOut}
+              className="border-[#E5DDD3] hover:border-[#1B365D] hover:bg-[#F5F0EA] text-[#1B365D] transition-colors duration-200"
+            >
+              <LogOut className="w-4 h-4 mr-2" />
+              Sign Out
             </Button>
-          </DialogTrigger>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Add New Application</DialogTitle>
-            </DialogHeader>
-            <form onSubmit={handleAddApp} className="space-y-4">
-              <div className="space-y-2">
-                <label className="text-sm font-medium">APK File</label>
-                <Input type="file" name="apk" accept=".apk" required />
-              </div>
-              <div className="space-y-2">
-                <label className="text-sm font-medium">App Icon</label>
-                <Input type="file" name="icon" accept="image/*" required />
-              </div>
-              <Input name="name" placeholder="App Name" required />
-              <Input name="version" placeholder="Version" required />
-              <Textarea name="description" placeholder="Description" required />
-              <Button type="submit" disabled={isLoading}>
-                {isLoading ? "Uploading..." : "Upload App"}
-              </Button>
-            </form>
-          </DialogContent>
-        </Dialog>
-      </div>
-
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Package className="w-4 h-4" /> Total Apps
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-3xl font-bold">{apps.length}</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Download className="w-4 h-4" /> Total Downloads
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-3xl font-bold">
-              {apps.reduce((acc, app) => acc + app.downloads, 0)}
-            </p>
-          </CardContent>
-        </Card>
-      </div>
-
-      <Card>
-        <CardHeader>
-          <CardTitle>Applications</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="divide-y">
-            {apps.map((app) => (
-              <div
-                key={app.id}
-                className="py-4 flex justify-between items-center"
-              >
-                <div>
-                  <h3 className="font-medium">{app.name}</h3>
-                  <p className="text-sm text-muted-foreground">
-                    v{app.version}
-                  </p>
-                </div>
-                <div className="flex items-center gap-4">
-                  <span className="text-sm text-muted-foreground">
-                    {app.downloads} downloads
-                  </span>
-                  <AlertDialog>
-                    <AlertDialogTrigger asChild>
-                      <Button variant="destructive" size="sm">
-                        Delete
-                      </Button>
-                    </AlertDialogTrigger>
-                    <AlertDialogContent>
-                      <AlertDialogHeader>
-                        <AlertDialogTitle>Delete {app.name}?</AlertDialogTitle>
-                        <AlertDialogDescription>
-                          This action cannot be undone. This will permanently
-                          delete the application and all its data.
-                        </AlertDialogDescription>
-                      </AlertDialogHeader>
-                      <AlertDialogFooter>
-                        <AlertDialogCancel>Cancel</AlertDialogCancel>
-                        <AlertDialogAction
-                          onClick={() => handleDeleteApp(app.id)}
-                          className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                        >
-                          Delete
-                        </AlertDialogAction>
-                      </AlertDialogFooter>
-                    </AlertDialogContent>
-                  </AlertDialog>
-                </div>
-              </div>
-            ))}
           </div>
-        </CardContent>
-      </Card>
-    </div>
+          <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
+            <DialogTrigger asChild>
+              <Button className="bg-[#1B365D] hover:bg-[#264773] transition-colors duration-200">
+                <Plus className="w-4 h-4 mr-2" /> Add New App
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="bg-white border border-[#E5DDD3]">
+              <DialogHeader>
+                <DialogTitle className="font-serif text-[#1B365D]">
+                  Add New Application
+                </DialogTitle>
+              </DialogHeader>
+              <form onSubmit={handleAddApp} className="space-y-4">
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-[#4A4645]">
+                    APK File
+                  </label>
+                  <Input
+                    type="file"
+                    name="apk"
+                    accept=".apk"
+                    required
+                    className="border-[#E5DDD3] focus:border-[#1B365D]"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-[#4A4645]">
+                    App Icon
+                  </label>
+                  <Input
+                    type="file"
+                    name="icon"
+                    accept="image/*"
+                    required
+                    className="border-[#E5DDD3] focus:border-[#1B365D]"
+                  />
+                </div>
+                <Input
+                  name="name"
+                  placeholder="App Name"
+                  required
+                  className="border-[#E5DDD3] focus:border-[#1B365D]"
+                />
+                <Input
+                  name="version"
+                  placeholder="Version"
+                  required
+                  className="border-[#E5DDD3] focus:border-[#1B365D]"
+                />
+                <Textarea
+                  name="description"
+                  placeholder="Description"
+                  required
+                  className="border-[#E5DDD3] focus:border-[#1B365D]"
+                />
+                <Button
+                  type="submit"
+                  disabled={isLoading}
+                  className="w-full bg-[#1B365D] hover:bg-[#264773] transition-colors duration-200"
+                >
+                  {isLoading ? "Uploading..." : "Upload App"}
+                </Button>
+              </form>
+            </DialogContent>
+          </Dialog>
+        </motion.div>
+
+        <motion.div
+          variants={container}
+          initial="hidden"
+          animate="show"
+          className="grid gap-4 md:grid-cols-2 lg:grid-cols-3"
+        >
+          <motion.div variants={item}>
+            <Card className="border-[#E5DDD3] bg-white shadow-sm hover:shadow-md transition-shadow duration-200">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 font-serif text-[#1B365D]">
+                  <Package className="w-4 h-4" /> Total Apps
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-3xl font-bold text-[#1B365D]">
+                  {apps.length}
+                </p>
+              </CardContent>
+            </Card>
+          </motion.div>
+
+          <motion.div variants={item}>
+            <Card className="border-[#E5DDD3] bg-white shadow-sm hover:shadow-md transition-shadow duration-200">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 font-serif text-[#1B365D]">
+                  <Download className="w-4 h-4" /> Total Downloads
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-3xl font-bold text-[#1B365D]">
+                  {apps.reduce((acc, app) => acc + app.downloads, 0)}
+                </p>
+              </CardContent>
+            </Card>
+          </motion.div>
+        </motion.div>
+
+        <motion.div variants={item}>
+          <Card className="border-[#E5DDD3] bg-white shadow-sm hover:shadow-md transition-shadow duration-200">
+            <CardHeader>
+              <CardTitle className="font-serif text-[#1B365D]">
+                Applications
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="divide-y divide-[#E5DDD3]">
+                {apps.map((app) => (
+                  <motion.div
+                    key={app.id}
+                    className="py-4 flex justify-between items-center"
+                    whileHover={{ backgroundColor: "#F5F0EA" }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    <div>
+                      <h3 className="font-medium text-[#1B365D]">{app.name}</h3>
+                      <p className="text-sm text-[#8B8685]">v{app.version}</p>
+                    </div>
+                    <div className="flex items-center gap-4">
+                      <span className="text-sm text-[#8B8685]">
+                        {app.downloads} downloads
+                      </span>
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <Button
+                            variant="destructive"
+                            size="sm"
+                            className="bg-red-50 text-red-600 hover:bg-red-100 border border-red-200"
+                          >
+                            Delete
+                          </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent className="bg-white border border-[#E5DDD3]">
+                          <AlertDialogHeader>
+                            <AlertDialogTitle className="font-serif text-[#1B365D]">
+                              Delete {app.name}?
+                            </AlertDialogTitle>
+                            <AlertDialogDescription className="text-[#4A4645]">
+                              This action cannot be undone. This will
+                              permanently delete the application and all its
+                              data.
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel className="border-[#E5DDD3] hover:border-[#1B365D] hover:bg-[#F5F0EA] text-[#1B365D]">
+                              Cancel
+                            </AlertDialogCancel>
+                            <AlertDialogAction
+                              onClick={() => handleDeleteApp(app.id)}
+                              className="bg-red-50 text-red-600 hover:bg-red-100 border border-red-200"
+                            >
+                              Delete
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        </motion.div>
+      </div>
+    </motion.div>
   );
 }

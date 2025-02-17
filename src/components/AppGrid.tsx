@@ -1,6 +1,7 @@
 import React from "react";
 import AppCard from "./AppCard";
 import { ScrollArea } from "./ui/scroll-area";
+import { motion } from "framer-motion";
 
 interface App {
   id: string;
@@ -14,6 +15,21 @@ interface AppGridProps {
   apps?: App[];
   onInstall?: (appId: string) => void;
 }
+
+const container = {
+  hidden: { opacity: 0 },
+  show: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.1,
+    },
+  },
+};
+
+const item = {
+  hidden: { opacity: 0, y: 20 },
+  show: { opacity: 1, y: 0 },
+};
 
 const AppGrid = ({
   apps = [
@@ -49,10 +65,19 @@ const AppGrid = ({
   onInstall = (appId: string) => console.log(`Installing app ${appId}`),
 }: AppGridProps) => {
   return (
-    <ScrollArea className="w-full h-full bg-gray-50 p-6">
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 max-w-[1400px] mx-auto">
+    <ScrollArea className="w-full h-full bg-[#FAFAF9] p-6">
+      <motion.div
+        variants={container}
+        initial="hidden"
+        animate="show"
+        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 max-w-[1400px] mx-auto"
+      >
         {apps.map((app) => (
-          <div key={app.id} className="flex justify-center">
+          <motion.div
+            key={app.id}
+            className="flex justify-center"
+            variants={item}
+          >
             <AppCard
               icon={app.icon}
               name={app.name}
@@ -60,9 +85,9 @@ const AppGrid = ({
               description={app.description}
               onInstall={() => onInstall(app.id)}
             />
-          </div>
+          </motion.div>
         ))}
-      </div>
+      </motion.div>
     </ScrollArea>
   );
 };
